@@ -1,3 +1,4 @@
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Collections.Generic;
 
@@ -9,9 +10,9 @@ public static unsafe class Addon
 
     private static readonly Dictionary<string, (short, short)> StoredPositions = new();
 
-    public static void SetAddonVisibility(string name, bool isVisible)
+    public static void SetAddonVisibility(string name, bool isVisible, IGameGui gameGui)
     {
-        nint addonPointer = UIVisibilityControl.GameGui.GetAddonByName(name, 1);
+        nint addonPointer = gameGui.GetAddonByName(name, 1);
         if (addonPointer == nint.Zero)
         {
             return;

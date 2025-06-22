@@ -10,22 +10,16 @@ namespace FaderPlugin;
 
 public class UIVisibilityControl : IDalamudPlugin
 {
+    private readonly ICondition condition;
+    private readonly IClientState clientState;
+    private readonly IGameGui gameGui;
     public bool ShowingHUD = true;
 
-    [PluginService] public static IDalamudPluginInterface PluginInterface { get; set; } = null!;
-    [PluginService] public static IKeyState KeyState { get; set; } = null!;
-    [PluginService] public static IFramework Framework { get; set; } = null!;
-    [PluginService] public static IClientState ClientState { get; set; } = null!;
-    [PluginService] public static ICondition Condition { get; set; } = null!;
-    [PluginService] public static ICommandManager CommandManager { get; set; } = null!;
-    [PluginService] public static IChatGui ChatGui { get; set; } = null!;
-    [PluginService] public static IGameGui GameGui { get; set; } = null!;
-    [PluginService] public static ITargetManager TargetManager { get; set; } = null!;
-    [PluginService] public static IDataManager Data { get; private set; } = null!;
-    [PluginService] public static IPluginLog Log { get; private set; } = null!;
-
-    public UIVisibilityControl()
+    public UIVisibilityControl(ICondition condition, IClientState clientState, IGameGui gameGui)
     {
+        this.condition = condition;
+        this.clientState = clientState;
+        this.gameGui = gameGui;
     }
 
     public void Dispose()
@@ -49,7 +43,7 @@ public class UIVisibilityControl : IDalamudPlugin
 
             foreach (string addonName in addonNames)
             {
-                Addon.SetAddonVisibility(addonName, visible);
+                Addon.SetAddonVisibility(addonName, visible, gameGui);
             }
 
             ShowingHUD = visible;
@@ -62,6 +56,7 @@ public class UIVisibilityControl : IDalamudPlugin
     /// </summary>
     private bool IsSafeToWork()
     {
-        return !Condition[ConditionFlag.BetweenAreas] && ClientState.IsLoggedIn;
+        return !condition[ConditionFlag.BetweenAreas]
+            && clientState.IsLoggedIn;
     }
 }
